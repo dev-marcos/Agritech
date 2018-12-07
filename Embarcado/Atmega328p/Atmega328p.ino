@@ -41,7 +41,7 @@ Pendente:
 
 
 typedef struct {
-  byte codProg = 0;
+  unsigned int codProg = 0;
   byte Logica = 0;
   byte tipoDado = 0;
   String valor1 = "";
@@ -51,15 +51,15 @@ typedef struct {
 }Prog;
 
 typedef struct {
-  byte codProg = 0;
+  unsigned int codProg = 0;
   bool condOld = false;
 }OldProg;
 
 
 RTC_DS1307 rtc;
 
-byte acaoExec = 0;
-byte OldAcaoExec = 0;
+unsigned int acaoExec = 0;
+unsigned int OldAcaoExec = 0;
 
 unsigned long IntervaloRep = 5000; //padrão 5 segundos
 unsigned long IntervaloLog = 5000; //padrão 30 minutos
@@ -123,7 +123,7 @@ void loop() {
 
 
 
-void executarAcao(byte acao){
+void executarAcao(unsigned int acao){
   if (acao!=OldAcaoExec){
     OldAcaoExec = acao;
  // iniciaSD(PIN_CS_SD);
@@ -183,6 +183,7 @@ void executarAcao(byte acao){
     
   } else {
     Serial.println("Erro ao abrir arquivo: " FILE_CONF_PROG);
+    asm volatile ("  jmp 0");
   }
   file.close();}
 }
@@ -267,11 +268,11 @@ void executarProg(){
       
       //remove o primeiro pipe
       cond.remove(0,1);
-	  
-	  prog.Logica = cond.substring(0, cond.indexOf("|")).toInt();
-      cond.remove(0, cond.indexOf("|")+1);
 
       prog.codProg = cond.substring(0, cond.indexOf("|")).toInt();
+      cond.remove(0, cond.indexOf("|")+1);
+      
+      prog.Logica = cond.substring(0, cond.indexOf("|")).toInt();
       cond.remove(0, cond.indexOf("|")+1);
 
       prog.tipoDado = cond.substring(0, cond.indexOf("|")).toInt();
@@ -323,6 +324,7 @@ void executarProg(){
     
   } else {
     Serial.println("Erro ao abrir arquivo: " FILE_CONF_PROG);
+    asm volatile ("  jmp 0");
   }
 
   file.close();
@@ -439,6 +441,7 @@ void loadConfig(){
       
     } else {
       Serial.println("Erro ao abrir arquivo: " FILE_CONF);
+      asm volatile ("  jmp 0");
     }
     file.close();
   }
